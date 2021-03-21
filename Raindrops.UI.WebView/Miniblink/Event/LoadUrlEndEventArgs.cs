@@ -23,7 +23,7 @@ namespace Raindrops.UI.WebView.Miniblink.Event
             {
                 lock (this)
                 {
-                    if (Buffer == IntPtr.Zero && Len > 0)
+                    if (Buffer == IntPtr.Zero || Len <= 0)
                         return null;
                     if (data != null)
                         return data;
