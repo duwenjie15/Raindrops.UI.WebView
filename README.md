@@ -19,20 +19,38 @@
 EventAdapterr<TEventArgs, TCallback> 内部使用ILEmit构造代码,无需担心性能问题。
 
 例子：
-EventAdapter<LoadUrlBeginEventArgs, mbLoadUrlBeginCallback> LoadUrlBegin = new EventAdapter<LoadUrlBeginEventArgs, mbLoadUrlBeginCallback>(this, NativeMethods.mbOnLoadUrlBegin);
-LoadUrlBegin.EventHandler += LoadUrlBegin_EventHandler;
-private void LoadUrlBegin_EventHandler(object sender, Miniblink.Event.LoadUrlBeginEventArgs eventArgs)
- {
-     if(eventArgs.Url.Contains("aaaaaa"))
-         eventArgs.Job.ChangeRequestUrl("www.baidu.com");
+    public class LoadUrlBeginEventArgs : EventArgs
+    {
+        [Map(Name = "url")]
+        public string Url { get; set; }
+        [Map(Name = "job")]
+        public mbNetJob Job { get; set; }
+        [Map(IsRet = true)]
+        public bool Result { get; set; }
+    }
 
-     var postBody = eventArgs.Job.GetPostBody();
-     if (postBody.elementSize.ToUInt32() > 0)
-         foreach (var body in postBody.GetElements())
-         {
-             var buffer = body.GetData().ToArray();
-             string value = Encoding.UTF8.GetString(buffer);
-             AppendLog($"Post {eventArgs.Url} -> StringLength:{value.Length}");
-         }
- }
+public partial class Browser : UserControl, IMiniblinkProxy
+{
+     public EventAdapter<LoadUrlBeginEventArgs, mbLoadUrlBeginCallback> LoadUrlBegin;
+     public Browser()
+     {
+         LoadUrlBegin = new EventAdapter<LoadUrlBeginEventArgs, mbLoadUrlBeginCallback>(this, NativeMethods.mbOnLoadUrlBegin);
+         LoadUrlBegin.EventHandler += LoadUrlBegin_EventHandler;
+     }
+     private void LoadUrlBegin_EventHandler(object sender, Miniblink.Event.LoadUrlBeginEventArgs eventArgs)
+      {
+          if(eventArgs.Url.Contains("aaaaaa"))  eventArgs.Job.ChangeRequestUrl("www.baidu.com");
+
+          var postBody = eventArgs.Job.GetPostBody();
+          if (postBody.elementSize.ToUInt32() > 0)
+          {
+              foreach (var body in postBody.GetElements())
+              {
+                  var buffer = body.GetData().ToArray();
+                  string value = Encoding.UTF8.GetString(buffer);
+                  AppendLog($"Post {eventArgs.Url} -> StringLength:{value.Length}");
+              }
+           }
+      }
+}
  So Easy
