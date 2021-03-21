@@ -167,6 +167,7 @@ namespace Raindrops.UI.WebView.Miniblink
                     iLGenerator.Emit(OpCodes.Ldfld, fieldInfo);
                     iLGenerator.Convert(fieldInfo.FieldType, methodInfo.ReturnType);
                 }
+                iLGenerator.Ret();
             }
 
             iLGenerator.MarkLabel(end);
