@@ -65,15 +65,6 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
         public void LoadHtmlWithBaseUrl(string html, string baseUrl) => NativeMethods.mbLoadHtmlWithBaseUrl(this, html, baseUrl);
         public void Resize(int w, int h) => NativeMethods.mbResize(this, w, h);
         public void Destroy() => NativeMethods.mbDestroyWebView(this);
-        /// <summary>
-        /// 对于异步返回的RunJs
-        /// 应确保script的指针在回调后或WebView销毁后回收
-        /// </summary>
-        /// <param name="mbWebFrameHandle"></param>
-        /// <param name="script"></param>
-        /// <param name="isInClosure"></param>
-        /// <param name="mbRunJsCallback"></param>
-        /// <param name="param"></param>
         public void RunJs(mbWebFrameHandle mbWebFrameHandle, string script, bool isInClosure, mbRunJsCallback mbRunJsCallback, IntPtr param) => NativeMethods.mbRunJs(this, mbWebFrameHandle, script, isInClosure, mbRunJsCallback, param, IntPtr.Zero);
     }
 }

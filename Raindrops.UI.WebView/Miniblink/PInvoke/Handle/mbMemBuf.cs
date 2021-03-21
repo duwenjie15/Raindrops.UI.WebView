@@ -13,22 +13,25 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
         {
             int len = (int)length;
             byte[] buffer = new byte[len];
-            unsafe
+            if (len > 0)
             {
-                fixed(byte* pDst= &buffer[0])
+                unsafe
                 {
-                    byte* ps = data;
-                    byte* pd = pDst;
-                    int round = len / 4;
-                    for (int n = 0; n < round; n++)
+                    fixed (byte* pDst = &buffer[0])
                     {
-                        *((int*)pd) = *((int*)ps);
-                        pd += 4;
-                        ps += 4;
+                        byte* ps = data;
+                        byte* pd = pDst;
+                        int round = len / 4;
+                        for (int n = 0; n < round; n++)
+                        {
+                            *((int*)pd) = *((int*)ps);
+                            pd += 4;
+                            ps += 4;
+                        }
+                        round = len % 4;
+                        for (int n = 0; n < round; n++)
+                            *pd++ = *ps++;
                     }
-                    round = len % 4;
-                    for (int n = 0; n < round; n++)
-                        *pd++ = *ps++;
                 }
             }
             return buffer;
