@@ -15,7 +15,7 @@
         using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
 #### 3、继承IMiniblinkProxy接口
 
-## 使用EventAdapterr<TEventArgs, TCallback> 它将自动寻找TCallback回调和TEventArgs属性、字段之间的对应关系,并自动封装成事件。
+## 使用EventAdapterr<TEventArgs, TCallback> 它将自动寻找TCallback回调和TEventArgs属性、字段之间的对应关系,自动转换类型,并自动封装成事件。
 ## EventAdapterr<TEventArgs, TCallback> 内部使用ILEmit构造代码,无需担心性能问题。
 
 ## 例子：
