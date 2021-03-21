@@ -43,13 +43,13 @@ EventAdapterr<TEventArgs, TCallback> 内部使用 ILEmit 构造代码,无需担�
 已封装好常用功能以及WebSocket接口,详细使用方法请看Raindrops.UI.WebView.TestWinForm
 
 ## 使用前需要
-1、来自miniblink的 mb.dll node.dll
-2、引入 
+#### 1、来自miniblink的 mb.dll node.dll
+#### 2、引入 
         using Raindrops.UI.WebView.Miniblink;
         using Raindrops.UI.WebView.Miniblink.Event;
         using Raindrops.UI.WebView.Miniblink.PInvoke;
         using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
-3、继承IMiniblinkProxy接口
+#### 3、继承IMiniblinkProxy接口
 
 ## 使用EventAdapterr<TEventArgs, TCallback> 它将自动寻找TCallback回调和TEventArgs属性、字段之间的对应关系,并自动封装成事件。
 ## EventAdapterr<TEventArgs, TCallback> 内部使用ILEmit构造代码,无需担心性能问题。
