@@ -21,6 +21,8 @@ namespace Raindrops.UI.WebView.TestWinForm
 
         private void Form1_Shown(object sender, EventArgs e)
         {
+            browser1 = new Browser() { Dock = DockStyle.Fill };
+            tableLayoutPanel1.Controls.Add(browser1, 0, 1);
             browser1.WebView.SetHandle(browser1.Handle);
             browser1.TitleChanged.EventHandler += TitleChanged_EventHandler;
             browser1.LoadUrlBegin.EventHandler += LoadUrlBegin_EventHandler;

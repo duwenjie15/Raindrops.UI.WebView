@@ -33,7 +33,6 @@ namespace Raindrops.UI.WebView.TestWinForm
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
-            this.browser1 = new Raindrops.UI.WebView.TestWinForm.Browser();
             this.panel1 = new System.Windows.Forms.Panel();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -93,15 +92,6 @@ namespace Raindrops.UI.WebView.TestWinForm
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(622, 94);
             this.textBox2.TabIndex = 2;
-            // 
-            // browser1
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.browser1, 2);
-            this.browser1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.browser1.Location = new System.Drawing.Point(3, 33);
-            this.browser1.Name = "browser1";
-            this.browser1.Size = new System.Drawing.Size(622, 314);
-            this.browser1.TabIndex = 3;
             // 
             // panel1
             // 

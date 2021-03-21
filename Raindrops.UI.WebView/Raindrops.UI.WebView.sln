@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raindrops.UI.WebView", "Raindrops.UI.WebView.csproj", "{B1488BBC-B7AB-452C-B5CC-33B98ED1E633}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raindrops.UI.WebView.TestWinForm", "..\Raindrops.UI.WebView.TestWinForm\Raindrops.UI.WebView.TestWinForm.csproj", "{7ADCECC0-64E8-493E-8C2F-E22810A1A2FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raindrops.UI.WebView.TestWinForm", "..\Raindrops.UI.WebView.TestWinForm\Raindrops.UI.WebView.TestWinForm.csproj", "{7ADCECC0-64E8-493E-8C2F-E22810A1A2FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
