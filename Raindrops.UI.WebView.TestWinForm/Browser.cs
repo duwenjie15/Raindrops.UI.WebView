@@ -29,6 +29,8 @@ namespace Raindrops.UI.WebView.TestWinForm
             InitializeComponent();
             if (IsDesignMode) return;
             WebView = mbWebView.Create();
+            if (!IsHandleCreated) CreateHandle();
+
             TitleChanged = new EventAdapter<TitleChangeEventArgs, mbTitleChangedCallback>(this, NativeMethods.mbOnTitleChanged);
             UrlChanged = new EventAdapter<UrlChangeEventArgs, mbURLChangedCallback>(this, NativeMethods.mbOnURLChanged);
             NewWindow = new EventAdapter<NewWindowEventArgs, mbCreateViewCallback>(this, NativeMethods.mbOnCreateView);
@@ -38,8 +40,9 @@ namespace Raindrops.UI.WebView.TestWinForm
             WebSocketOnReceive = new EventAdapter<WebSocketDataEventArgs, onReceive>(this, RegSocketOnReceive);
             WebSocketOnSend = new EventAdapter<WebSocketDataEventArgs, onSend>(this, RegSocketOnSend);
             WebSocketOnError = new EventAdapter<WebSocketErrorEventArgs, onError>(this, RegSocketOnError);
-            WebView.SetHandle(Handle);
+
         }
+
         private mbWebsocketHookCallbacks mbWebsocketHookCallbacks;
         public bool RegSocketOnWillConnect(mbWebView mbWebView, onWillConnect onWillConnect, IntPtr param)
         {

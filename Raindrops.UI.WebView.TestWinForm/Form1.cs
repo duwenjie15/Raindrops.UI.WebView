@@ -16,7 +16,20 @@ namespace Raindrops.UI.WebView.TestWinForm
         public Form1()
         {
             InitializeComponent();
-            
+            Shown += Form1_Shown;
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            browser1.WebView.SetHandle(browser1.Handle);
+            browser1.TitleChanged.EventHandler += TitleChanged_EventHandler;
+            browser1.LoadUrlBegin.EventHandler += LoadUrlBegin_EventHandler;
+            browser1.WebSocketOnWillConnect.EventHandler += WebSocketOnWillConnect_EventHandler;
+            browser1.WebSocketOnConnect.EventHandler += WebSocketOnConnect_EventHandler;
+            browser1.WebSocketOnSend.EventHandler += WebSocketOnSend_EventHandler;
+            browser1.WebSocketOnReceive.EventHandler += WebSocketOnReceive_EventHandler;
+            browser1.WebSocketOnError.EventHandler += WebSocketOnError_EventHandler;
+            browser1.WebView.LoadUrl("http://coolaf.com/tool/chattest");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -28,19 +41,6 @@ namespace Raindrops.UI.WebView.TestWinForm
         {
             url = url.Trim();
             browser1.WebView.LoadUrl(url);
-        }
-
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            browser1.TitleChanged.EventHandler += TitleChanged_EventHandler;
-            browser1.LoadUrlBegin.EventHandler += LoadUrlBegin_EventHandler;
-            browser1.WebSocketOnWillConnect.EventHandler += WebSocketOnWillConnect_EventHandler;
-            browser1.WebSocketOnConnect.EventHandler += WebSocketOnConnect_EventHandler;
-            browser1.WebSocketOnSend.EventHandler += WebSocketOnSend_EventHandler;
-            browser1.WebSocketOnReceive.EventHandler += WebSocketOnReceive_EventHandler;
-            browser1.WebSocketOnError.EventHandler += WebSocketOnError_EventHandler;
-            browser1.WebView.LoadUrl("http://coolaf.com/tool/chattest");
         }
 
         private void WebSocketOnError_EventHandler(object sender, Miniblink.Event.WebSocketErrorEventArgs eventArgs)
