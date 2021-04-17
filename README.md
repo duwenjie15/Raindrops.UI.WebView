@@ -1,8 +1,8 @@
 # Welcome to Raindrops.UI.WebView 
- miniblink vip版本封装使用
-使用它你可以很轻松将miniblink引入你的任何C#项目
-所有的P/Invoke代码位于NativeMethods内部
-所有的事件位于 Miniblink/Event目录下
+## miniblink vip版本封装
+	使用它你可以很轻松将miniblink引入你的任何C#项目
+	所有的P/Invoke代码位于NativeMethods内部
+	所有的事件位于 Miniblink/Event目录下
 
 已封装好常用功能以及WebSocket接口,详细使用方法请看Raindrops.UI.WebView.TestWinForm
 
@@ -15,8 +15,8 @@
         using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
 #### 3、继承IMiniblinkProxy接口
 
-## 使用EventAdapterr<TEventArgs, TCallback> 它将自动寻找TCallback回调和TEventArgs属性、字段之间的对应关系,并自动封装成事件。
-## EventAdapterr<TEventArgs, TCallback> 内部使用ILEmit构造代码,无需担心性能问题。
+## 使用EventAdapter<TEventArgs, TCallback> 它将自动寻找TCallback回调和TEventArgs属性、字段之间的对应关系,自动转换类型,并自动封装成事件。
+## EventAdapter<TEventArgs, TCallback> 内部使用ILEmit构造代码,无需担心性能问题。
 
 ## 例子：
 
