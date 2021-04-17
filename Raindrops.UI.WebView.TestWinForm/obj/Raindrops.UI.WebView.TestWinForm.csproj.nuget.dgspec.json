@@ -13,6 +13,7 @@
         "packagesPath": "C:\\Users\\CoCoCoser\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\obj\\",
         "projectStyle": "PackageReference",
+        "crossTargeting": true,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
@@ -22,6 +23,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
+          "net40",
           "netcoreapp3.1"
         ],
         "sources": {
@@ -32,6 +34,14 @@
         "frameworks": {
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
+                "projectPath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
+              }
+            }
+          },
+          "net40": {
+            "targetAlias": "net40",
             "projectReferences": {
               "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
                 "projectPath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
@@ -66,6 +76,10 @@
               "privateAssets": "none"
             }
           },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        },
+        "net40": {
+          "targetAlias": "net40",
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }

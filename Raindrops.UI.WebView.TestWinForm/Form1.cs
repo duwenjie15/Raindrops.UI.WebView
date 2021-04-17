@@ -1,10 +1,5 @@
-﻿using Raindrops.UI.WebView.Miniblink.PInvoke;
+﻿using Raindrops.UI.WebView.Miniblink;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -110,11 +105,12 @@ namespace Raindrops.UI.WebView.TestWinForm
             }
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         { 
             string script = textBox3.Text.Trim();
-            object result = await browser1.WebView.RunJs(script, true);
-            MessageBox.Show(result.ToString());
+            Task<RetValue> Task = browser1.WebView.RunJs(script, true);
+            Task.Wait();
+            MessageBox.Show(Task.Result.ToString());
         }
     }
 }
