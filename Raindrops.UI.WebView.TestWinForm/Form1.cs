@@ -113,7 +113,7 @@ namespace Raindrops.UI.WebView.TestWinForm
         private async void button2_Click(object sender, EventArgs e)
         { 
             string script = textBox3.Text.Trim();
-            object result = await browser1.RunJs(script, true);
+            object result = await browser1.WebView.RunJs(script, true);
             MessageBox.Show(result.ToString());
         }
     }
