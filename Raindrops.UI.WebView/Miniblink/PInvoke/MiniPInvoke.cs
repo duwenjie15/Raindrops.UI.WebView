@@ -359,13 +359,13 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     public delegate IntPtr WndProcCallback(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate mbStringPtr onWillConnect(mbWebView webView, IntPtr param, mbWebSocketChannel channel, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In,Out]ref bool needHook);
+    public delegate mbStringPtr onWillConnect(mbWebView webView, IntPtr param, mbWebSocketChannel channel, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In]ref bool needHook);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
     public delegate int onConnected(mbWebView webView, IntPtr param, mbWebSocketChannel channel);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate mbStringPtr onReceive(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [In,Out] ref bool isContinue);
+    public delegate mbStringPtr onReceive(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [In] ref bool isContinue);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate mbStringPtr onSend(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [In,Out] ref bool isContinue);
+    public delegate mbStringPtr onSend(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [In] ref bool isContinue);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
     public delegate void onError(mbWebView webView, IntPtr param, mbWebSocketChannel channel);
     [StructLayout(LayoutKind.Sequential)]
