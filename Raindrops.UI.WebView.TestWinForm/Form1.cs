@@ -108,7 +108,7 @@ namespace Raindrops.UI.WebView.TestWinForm
         private void button2_Click(object sender, EventArgs e)
         { 
             string script = textBox3.Text.Trim();
-            Task<RetValue> Task = browser1.WebView.RunJs(script, true);
+            Task<RetValue> Task = browser1.RunJs(script, true);
             Task.Wait();
             MessageBox.Show(Task.Result.ToString());
         }

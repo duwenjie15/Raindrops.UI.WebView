@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
 {
@@ -70,46 +67,5 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
         public void Resize(int w, int h) => NativeMethods.mbResize(this, w, h);
         public void Destroy() => NativeMethods.mbDestroyWebView(this);
         public void RunJs(mbWebFrameHandle mbWebFrameHandle, string script, bool isInClosure, mbRunJsCallback mbRunJsCallback, IntPtr param) => NativeMethods.mbRunJs(this, mbWebFrameHandle, script, isInClosure, mbRunJsCallback, param, IntPtr.Zero);
-        //Ex
-        internal static int seed = 0;
-        internal static ConcurrentDictionary<IntPtr, TaskCompletionSource<RetValue>> _runJsCallbackDict = new ConcurrentDictionary<IntPtr, TaskCompletionSource<RetValue>>();
-        internal static ConcurrentDictionary<IntPtr, TaskCompletionSource<string>> _getCookieCallbackDict = new ConcurrentDictionary<IntPtr, TaskCompletionSource<string>>();
-        internal static IntPtr CreateToken()
-        {
-            return (IntPtr)Interlocked.Increment(ref seed);
-        }
-        internal static void RunJsCallback(mbWebView webview, IntPtr token, mbJsExecState es, mbJsValue v)
-        {
-            RetValue retValue = new RetValue(webview, token, es, v);
-            if (_runJsCallbackDict.TryRemove(token, out var taskCompletionSource))
-            {
-                taskCompletionSource.SetResult(retValue);
-            }
-        }
-        public Task<RetValue> RunJs(string js, bool isInClosure) => RunJs(GetMainFrame(), js, isInClosure);
-
-        public Task<RetValue> RunJs(mbWebFrameHandle mbWebFrameHandle, string js, bool isInClosure)
-        {
-            IntPtr token = CreateToken();
-            var taskSource = new TaskCompletionSource<RetValue>();
-            _runJsCallbackDict.TryAdd(token, taskSource);
-            RunJs(mbWebFrameHandle, js, isInClosure, RunJsCallback, token);
-            return taskSource.Task;
-        }
-        internal static void GetCookieCallback(mbWebView webview, IntPtr token, MbAsynRequestState state, string cookie)
-        {
-            if (_getCookieCallbackDict.TryRemove(token, out var taskCompletionSource))
-            {
-                taskCompletionSource.SetResult(state == MbAsynRequestState.kMbAsynRequestStateOk ? cookie : null);
-            }
-        }
-        public Task<string> GetCookie()
-        {
-            IntPtr token = CreateToken();
-            var taskSource = new TaskCompletionSource<string>();
-            _getCookieCallbackDict.TryAdd(token, taskSource);
-            GetCookie(GetCookieCallback, token);
-            return taskSource.Task;
-        }
     }
 }
