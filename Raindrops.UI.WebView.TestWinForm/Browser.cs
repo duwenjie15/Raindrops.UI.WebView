@@ -50,6 +50,7 @@ namespace Raindrops.UI.WebView.TestWinForm
 
             mbPaintUpdatedCallback = new mbPaintUpdatedCallback(OnPaintUpdate);
             NativeMethods.mbOnPaintUpdated(WebView, mbPaintUpdatedCallback, Handle);
+            ImeMode = ImeMode.On;
         }
         public bool Simulate { get; set; }
         public mbWebView WebView { get; private set; }

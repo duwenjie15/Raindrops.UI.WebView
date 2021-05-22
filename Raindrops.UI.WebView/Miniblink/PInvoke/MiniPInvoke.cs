@@ -102,7 +102,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public mbOnBlinkThreadInitCallback blinkThreadInitCallback;
         public IntPtr blinkThreadInitCallbackParam;
         public IntPtr version;
-        [MarshalAs(UnmanagedType.LPWStr)] 
+        [MarshalAs(UnmanagedType.LPWStr)]
         public string mainDllPath;
         public IntPtr mainDllHanlde;
     }
@@ -359,13 +359,13 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     public delegate IntPtr WndProcCallback(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate mbStringPtr onWillConnect(mbWebView webView, IntPtr param, mbWebSocketChannel channel, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In]ref bool needHook);
+    public delegate mbStringPtr onWillConnect(mbWebView webView, IntPtr param, mbWebSocketChannel channel, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [MarshalAs(UnmanagedType.I1)] ref bool needHook);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
     public delegate int onConnected(mbWebView webView, IntPtr param, mbWebSocketChannel channel);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate mbStringPtr onReceive(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [In] ref bool isContinue);
+    public delegate mbStringPtr onReceive(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [MarshalAs(UnmanagedType.I1)] ref bool isContinue);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate mbStringPtr onSend(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [In] ref bool isContinue);
+    public delegate mbStringPtr onSend(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [MarshalAs(UnmanagedType.I1)] ref bool isContinue);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
     public delegate void onError(mbWebView webView, IntPtr param, mbWebSocketChannel channel);
     [StructLayout(LayoutKind.Sequential)]
@@ -429,7 +429,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
     public delegate int mbNavigationCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public unsafe delegate IntPtr mbCreateViewCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In]ref mbWindowFeatures windowFeatures);
+    public unsafe delegate IntPtr mbCreateViewCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In] ref mbWindowFeatures windowFeatures);
 
 
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
@@ -558,7 +558,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     }
 
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate mbDownloadOpt mbDownloadInBlinkThreadCallback(mbWebView webview, IntPtr param, IntPtr expectedContentLength, [In, MarshalAs(UnmanagedType.LPStr)] string url, [In, MarshalAs(UnmanagedType.LPStr)] string mime, [In, MarshalAs(UnmanagedType.LPStr)] string disposition, mbNetJob job, [In]ref mbNetJobDataBind dataBind);
+    public delegate mbDownloadOpt mbDownloadInBlinkThreadCallback(mbWebView webview, IntPtr param, IntPtr expectedContentLength, [In, MarshalAs(UnmanagedType.LPStr)] string url, [In, MarshalAs(UnmanagedType.LPStr)] string mime, [In, MarshalAs(UnmanagedType.LPStr)] string disposition, mbNetJob job, [In] ref mbNetJobDataBind dataBind);
     [StructLayout(LayoutKind.Sequential)]
     public struct mbPdfDatas
     {
@@ -567,7 +567,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public IntPtr datas;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbPrintPdfDataCallback(mbWebView webview, IntPtr param, [In]ref mbPdfDatas datas);
+    public delegate void mbPrintPdfDataCallback(mbWebView webview, IntPtr param, [In] ref mbPdfDatas datas);
     [StructLayout(LayoutKind.Sequential)]
     public struct mbScreenshotSettings
     {
@@ -604,7 +604,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public bool draggable;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbDraggableRegionsChangedCallback(mbWebView webview, IntPtr param,[In] ref mbDraggableRegion rects, int rectCount);
+    public delegate void mbDraggableRegionsChangedCallback(mbWebView webview, IntPtr param, [In] ref mbDraggableRegion rects, int rectCount);
     public enum mbPrintintStep
     {
         kPrintintStepStart,
@@ -620,7 +620,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public float scale;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbPrintingCallback(mbWebView webview, IntPtr param, mbPrintintStep step, IntPtr hDC,[In] ref mbPrintintSettings settings, int pageCount);
+    public delegate int mbPrintingCallback(mbWebView webview, IntPtr param, mbPrintintStep step, IntPtr hDC, [In] ref mbPrintintSettings settings, int pageCount);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate mbStringPtr mbImageBufferToDataURLCallback(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string data, size_t size);
     [StructLayout(LayoutKind.Sequential)]
@@ -634,7 +634,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     public partial class NativeMethods
     {
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE)]
-        public static extern unsafe void mbInit([In]ref mbSettings mbSettings);
+        public static extern unsafe void mbInit([In] ref mbSettings mbSettings);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbUninit")]
         public static extern void mbUninit();
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbCreateWebView")]
@@ -689,7 +689,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetHoldJobToAsynCommit")]
         public static extern bool mbNetHoldJobToAsynCommit(mbNetJob jobPtr);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetCancelRequest")]
-        public static extern void mbNetCancelRequest(mbNetJob jobPtr); 
+        public static extern void mbNetCancelRequest(mbNetJob jobPtr);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetOnResponse")]
         public static extern void mbNetOnResponse(mbWebView webview, mbNetResponseCallback callback, IntPtr param);
 

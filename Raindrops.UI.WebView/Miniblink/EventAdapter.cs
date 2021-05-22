@@ -73,7 +73,7 @@ namespace Raindrops.UI.WebView.Miniblink
             parameterTypes[0] = GetType();
             for (int i = 0; i < parameterInfos.Length; i++) parameterTypes[i + 1] = parameterInfos[i].ParameterType;
 
-            DynamicMethod dynamicMethod = new DynamicMethod(string.Empty, methodInfo.ReturnType, parameterTypes, GetType());
+            DynamicMethod dynamicMethod = new DynamicMethod(string.Empty, methodInfo.ReturnType, parameterTypes, GetType(), true);
             ILGenerator iLGenerator = dynamicMethod.GetILGenerator();
 
 
@@ -96,9 +96,15 @@ namespace Raindrops.UI.WebView.Miniblink
 
             //Stacktop eventObj
             //Map
+            Map retMap = null;
             Map[] maps = MappingCache.GetMap(eventType, parameterInfos);
             foreach (Map map in maps)
             {
+                if (map.IsRet)
+                {
+                    retMap = map;
+                    continue;
+                }
                 //Copy stacktop
                 iLGenerator.Emit(OpCodes.Dup);
                 //+1 because first parameter is this
@@ -130,8 +136,6 @@ namespace Raindrops.UI.WebView.Miniblink
             iLGenerator.PushLocal(eventObj);
             iLGenerator.Call(typeof(Handler).GetMethod(nameof(Handler.Invoke)));
 
-
-            Map retMap = null;
             foreach (Map map in maps)
             {
                 if (map.IsRef)
@@ -151,7 +155,6 @@ namespace Raindrops.UI.WebView.Miniblink
                     }
                     iLGenerator.TransferRef(map.ParameterInfo.ParameterType);
                 }
-                if (map.IsRet) retMap = map; 
             }
 
             if (retMap != null && methodInfo.ReturnType != typeof(void))

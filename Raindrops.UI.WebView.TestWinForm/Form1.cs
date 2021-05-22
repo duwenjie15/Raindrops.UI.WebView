@@ -93,7 +93,7 @@ namespace Raindrops.UI.WebView.TestWinForm
         private void TitleChanged_EventHandler(object sender, Miniblink.Event.TitleChangeEventArgs eventArgs)
         {
             BeginInvoke(new Action(() => {
-                this.textBox1.Text = eventArgs.Title;
+                this.Text = eventArgs.Title;
             }));
         }
 
@@ -108,9 +108,14 @@ namespace Raindrops.UI.WebView.TestWinForm
         private void button2_Click(object sender, EventArgs e)
         { 
             string script = textBox3.Text.Trim();
-            Task<RetValue> Task = browser1.RunJs(script, true);
-            Task.Wait();
-            MessageBox.Show(Task.Result.ToString());
+            Task<RetValue> value = browser1.RunJs(script, true);
+            value.ContinueWith(x =>
+            {
+                BeginInvoke(new Action(delegate
+                {
+                    MessageBox.Show(x.Result.ToString());
+                }));
+            });
         }
     }
 }
