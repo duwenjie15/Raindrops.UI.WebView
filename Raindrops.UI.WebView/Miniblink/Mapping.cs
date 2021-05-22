@@ -81,6 +81,7 @@ namespace Raindrops.UI.WebView.Miniblink
                     if (!string.IsNullOrEmpty(mapAttribute.Name))
                         name = mapAttribute.Name;
                     isRef = mapAttribute.IsRef;
+                    isRet = mapAttribute.IsRet;
                 }
                 if (FindParameter(name, out int index) || isRet)
                 {
