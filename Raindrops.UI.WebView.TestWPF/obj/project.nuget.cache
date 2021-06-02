@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "9+PASsh5hmY/vTkrpRwGG2jYj/nzsZ7L2N7qegn4IjuMPXgq1KnUtDx0Uo8UtegLXOReV0lRn64eDfljjb8I8Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\Raindrops.UI.WebView.TestWPF.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\CoCoCoser\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
+    "C:\\Users\\CoCoCoser\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512",
+    "C:\\Users\\CoCoCoser\\.nuget\\packages\\system.reflection.emit.ilgeneration\\4.7.0\\system.reflection.emit.ilgeneration.4.7.0.nupkg.sha512",
+    "C:\\Users\\CoCoCoser\\.nuget\\packages\\system.reflection.emit.lightweight\\4.7.0\\system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}
