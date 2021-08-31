@@ -13,7 +13,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
                     if (!IsGlobalInitialization)
                     {
                         mbSettings mbSettings = new mbSettings();
-                        mbSettings.mask = mbSettingMask.MB_ENABLE_DISABLE_H5VIDEO | mbSettingMask.MB_SETTING_PAINTCALLBACK_IN_OTHER_THREAD;
+                        mbSettings.mask = mbSettingMask.MB_ENABLE_NODEJS | mbSettingMask.MB_ENABLE_DISABLE_H5VIDEO;
                         NativeMethods.mbInit(ref mbSettings);
                         IsGlobalInitialization = true;
                     }

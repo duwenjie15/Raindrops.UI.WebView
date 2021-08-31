@@ -1,10 +1,12 @@
-﻿using Raindrops.UI.WebView.Miniblink;
+﻿using Raindrops.UI.WebView;
+using Raindrops.UI.WebView.Miniblink;
 using Raindrops.UI.WebView.Miniblink.Event;
 using Raindrops.UI.WebView.Miniblink.PInvoke;
 using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -12,8 +14,11 @@ namespace Raindrops.UI.WebView.TestWinForm
 {
     public partial class Browser : UserControl, IMiniblinkProxy
     {
-        private mbWebsocketHookCallbacks mbWebsocketHookCallbacks;
-        private mbPaintUpdatedCallback mbPaintUpdatedCallback;
+        private readonly mbPaintBitUpdatedCallback _mbPaintBitUpdatedCallback;
+        private mbWebsocketHookCallbacks _mbWebsocketHookCallbacks;
+        private Bitmap _image;
+        private Size _drawSize;
+        private bool _disposed;
 
         public EventAdapter<LoadUrlBeginEventArgs, mbLoadUrlBeginCallback> LoadUrlBegin;
         public EventAdapter<TitleChangeEventArgs, mbTitleChangedCallback> TitleChanged;
@@ -26,6 +31,7 @@ namespace Raindrops.UI.WebView.TestWinForm
         public EventAdapter<WebSocketErrorEventArgs, onError> WebSocketOnError;
         public EventAdapter<LoadUrlEndEventArgs, mbLoadUrlEndCallback> LoadUrlEnd;
         public EventAdapter<DocumentReadyEventArgs, mbDocumentReadyCallback> DocumentReady;
+        public EventAdapter<OnJsQueryEventArgs, mbJsQueryCallback> JsQuery;
         public Browser()
         {
             InitializeComponent();
@@ -44,13 +50,78 @@ namespace Raindrops.UI.WebView.TestWinForm
             WebSocketOnError = new EventAdapter<WebSocketErrorEventArgs, onError>(this, RegSocketOnError);
             LoadUrlEnd = new EventAdapter<LoadUrlEndEventArgs, mbLoadUrlEndCallback>(this, NativeMethods.mbOnLoadUrlEnd);
             DocumentReady = new EventAdapter<DocumentReadyEventArgs, mbDocumentReadyCallback>(this, NativeMethods.mbOnDocumentReady);
+            JsQuery = new EventAdapter<OnJsQueryEventArgs, mbJsQueryCallback>(this, NativeMethods.mbOnJsQuery);
 
             if (!IsHandleCreated) CreateHandle();
+            NativeMethods.mbSetAutoDrawToHwnd(WebView, false);
+            _mbPaintBitUpdatedCallback = new mbPaintBitUpdatedCallback(mbPaintBitUpdated);
+            NativeMethods.mbOnPaintBitUpdated(WebView, _mbPaintBitUpdatedCallback, IntPtr.Zero);
             WebView.SetHandle(Handle);
+            ImeContext.SetImeStatus(ImeMode.NoControl, Handle);
+            ImeMode = ImeMode.Off;
+            Disposed += Browser_Disposed;
+            DoubleBuffered = true;
+        }
+        public void mbPaintBitUpdated(mbWebView webview, IntPtr param, IntPtr buffer, ref mbRect r, int width, int height)
+        {
+            if (_image == null || _image.Width < width || _image.Height < height)
+            {
+                lock (this)
+                    _image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            }
+            _drawSize = new Size(width, height);
+            //计算更新区域
+            var rect = new Rectangle
+            {
+                X = r.x >= width ? width - 1 : r.x,
+                Y = r.y >= height ? height - 1 : r.y
+            };
+            rect.Width = rect.X + r.w > width ? width - rect.X : r.w;
+            rect.Height = rect.Y + r.h > height ? height - rect.Y : r.h;
 
-            mbPaintUpdatedCallback = new mbPaintUpdatedCallback(OnPaintUpdate);
-            NativeMethods.mbOnPaintUpdated(WebView, mbPaintUpdatedCallback, Handle);
-            ImeMode = ImeMode.On;
+            BitmapData bitmapData = _image.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            IntPtr ptr = bitmapData.Scan0;
+            unsafe
+            {
+                int targetStride = _image.Width;
+                int sourceStride = width;
+                int* target = (int*)ptr;
+                int* source = (int*)buffer;
+                int targetPix;
+                int sourcePix;
+                for (int h = 0; h < rect.Height; h++)
+                {
+                    for (int w = 0; w < rect.Width; w++)
+                    {
+                        targetPix = targetStride * h + w;
+                        sourcePix = sourceStride * (rect.Y + h) + (rect.X + w);
+                        *(target + targetPix) = *(source + sourcePix);
+                    }
+                }
+            }
+            _image.UnlockBits(bitmapData);
+
+
+            Invalidate();
+        }
+        private void Browser_Disposed(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void Close()
+        {
+            if (!_disposed)
+                lock (this)
+                {
+                    if (!_disposed)
+                    {
+                        _disposed = true;
+                        NativeMethods.mbOnPaintBitUpdated(WebView, null, Handle);
+                        WebView.SetHandle(IntPtr.Zero);
+                        WebView.Destroy();
+                    }
+                }
         }
         public bool Simulate { get; set; }
         public mbWebView WebView { get; private set; }
@@ -64,15 +135,20 @@ namespace Raindrops.UI.WebView.TestWinForm
         }
         public void OnPaintUpdate(mbWebView webview, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy)
         {
-            Graphics graphics = CreateGraphics();
-            IntPtr ptr = graphics.GetHdc();
-            try
+            if (!IsDisposed)
             {
-                BitBlt(ptr, x, y, cx, cy, hdc, x, y, 0xcc0020);
-            }
-            finally
-            {
-                graphics.ReleaseHdc(ptr);
+                using (Graphics graphics = CreateGraphics())
+                {
+                    IntPtr ptr = graphics.GetHdc();
+                    try
+                    {
+                        BitBlt(ptr, x, y, cx, cy, hdc, x, y, 0xcc0020);
+                    }
+                    finally
+                    {
+                        graphics.ReleaseHdc(ptr);
+                    }
+                }
             }
         }
         [DllImport("gdi32.dll")]
@@ -89,8 +165,8 @@ namespace Raindrops.UI.WebView.TestWinForm
             );
         public bool RegSocketOnWillConnect(mbWebView mbWebView, onWillConnect onWillConnect, IntPtr param)
         {
-            mbWebsocketHookCallbacks.onWillConnect = onWillConnect;
-            return RegWebsocketHookCallbacks(mbWebView, ref mbWebsocketHookCallbacks, param);
+            _mbWebsocketHookCallbacks.onWillConnect = onWillConnect;
+            return RegWebsocketHookCallbacks(mbWebView, ref _mbWebsocketHookCallbacks, param);
         }
         public bool RegWebsocketHookCallbacks(mbWebView mbWebView, ref mbWebsocketHookCallbacks mbWebsocketHookCallbacks, IntPtr param)
         {
@@ -100,23 +176,23 @@ namespace Raindrops.UI.WebView.TestWinForm
         }
         public bool RegSocketOnConnected(mbWebView mbWebView, onConnected onConnected, IntPtr param)
         {
-            mbWebsocketHookCallbacks.onConnected = onConnected;
-            return RegWebsocketHookCallbacks(mbWebView, ref mbWebsocketHookCallbacks, param);
+            _mbWebsocketHookCallbacks.onConnected = onConnected;
+            return RegWebsocketHookCallbacks(mbWebView, ref _mbWebsocketHookCallbacks, param);
         }
         public bool RegSocketOnReceive(mbWebView mbWebView, onReceive onReceive, IntPtr param)
         {
-            mbWebsocketHookCallbacks.onReceive = onReceive;
-            return RegWebsocketHookCallbacks(mbWebView, ref mbWebsocketHookCallbacks, param); ;
+            _mbWebsocketHookCallbacks.onReceive = onReceive;
+            return RegWebsocketHookCallbacks(mbWebView, ref _mbWebsocketHookCallbacks, param); ;
         }
         public bool RegSocketOnSend(mbWebView mbWebView, onSend onSend, IntPtr param)
         {
-            mbWebsocketHookCallbacks.onSend = onSend;
-            return RegWebsocketHookCallbacks(mbWebView, ref mbWebsocketHookCallbacks, param);
+            _mbWebsocketHookCallbacks.onSend = onSend;
+            return RegWebsocketHookCallbacks(mbWebView, ref _mbWebsocketHookCallbacks, param);
         }
         public bool RegSocketOnError(mbWebView mbWebView, onError onError, IntPtr param)
         {
-            mbWebsocketHookCallbacks.onError = onError;
-            return RegWebsocketHookCallbacks(mbWebView, ref mbWebsocketHookCallbacks, param);
+            _mbWebsocketHookCallbacks.onError = onError;
+            return RegWebsocketHookCallbacks(mbWebView, ref _mbWebsocketHookCallbacks, param);
         }
         protected override void OnResize(EventArgs e)
         {
@@ -140,7 +216,13 @@ namespace Raindrops.UI.WebView.TestWinForm
             {
                 DrawString(e.Graphics, "SimulateMode");
             }
-            base.OnPaint(e);
+            if (_image != default)
+            {
+                lock (this)
+                {
+                    e.Graphics.DrawImage(_image, 0, 0);
+                }
+            }
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -279,13 +361,13 @@ namespace Raindrops.UI.WebView.TestWinForm
         protected override void WndProc(ref Message m)
         {
             IntPtr result = IntPtr.Zero;
+
             switch (m.Msg)
             {
-                case 20:
+                case Win32NativeMethods.WM_ERASEBKGND:
                     m.Result = ((IntPtr)1);
                     break;
-                case 123:
-                    uint flags = 0;
+                case Win32NativeMethods.WM_CONTEXTMENU:
                     int x = m.LParam.ToInt32() & 65535;
                     int y = m.LParam.ToInt32() >> 16;
                     if (x != -1 && y != -1)
@@ -294,22 +376,20 @@ namespace Raindrops.UI.WebView.TestWinForm
                         WebView.FireContextMenuEvent(p.X, p.Y, (uint)m.WParam);
                     }
                     break;
-
-                case 32:
-                case 269:
-                case 270:
-                    {
-                        if (WebView.HaveValue && WebView.FireWindowsMessage(m.HWnd, (uint)m.Msg, m.WParam, m.LParam, ref result))
-                            m.Result = result;
-                        return;
-                    }
+                case Win32NativeMethods.APPCOMMAND_SAVE:
+                case Win32NativeMethods.WM_IME_SETCONTEXT:
+                case Win32NativeMethods.WM_IME_STARTCOMPOSITION:
+                case Win32NativeMethods.WM_IME_ENDCOMPOSITION:
+                    if (WebView.HaveValue && WebView.FireWindowsMessage(m.HWnd, (uint)m.Msg, m.WParam, m.LParam, ref result))
+                        m.Result = result;
+                    return;
             }
             base.WndProc(ref m);
         }
-        ~Browser()
-        {
-            WebView.SetHandle(IntPtr.Zero);
-            WebView.Destroy();
-        }
+        //~Browser()
+        //{
+        //    WebView.SetHandle(IntPtr.Zero);
+        //    WebView.Destroy();
+        //}
     }
 }

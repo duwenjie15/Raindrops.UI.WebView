@@ -14,19 +14,20 @@ namespace Raindrops.UI.WebView.Miniblink
     public static class IMiniblinkProxyExtension
     {
         //Ex
-        internal static int seed = 0;
-        internal static ConcurrentDictionary<IntPtr, TaskCompletionSource<RetValue>> _runJsCallbackDict = new ConcurrentDictionary<IntPtr, TaskCompletionSource<RetValue>>();
-        internal static ConcurrentDictionary<IntPtr, TaskCompletionSource<string>> _getCookieCallbackDict = new ConcurrentDictionary<IntPtr, TaskCompletionSource<string>>();
-        internal static readonly mbRunJsCallback _mbRunJsCallback = new mbRunJsCallback(RunJsCallback);
-        internal static readonly mbGetCookieCallback _mbGetCookieCallback = new mbGetCookieCallback(GetCookieCallback);
+        internal static int s_seed = 0;
+        internal static ConcurrentDictionary<IntPtr, TaskCompletionSource<RetValue>> s_runJsCallbackDict = new ConcurrentDictionary<IntPtr, TaskCompletionSource<RetValue>>();
+        internal static ConcurrentDictionary<IntPtr, TaskCompletionSource<string>> s_getStringCallbackDict = new ConcurrentDictionary<IntPtr, TaskCompletionSource<string>>();
+        internal static readonly mbRunJsCallback s_mbRunJsCallback = new mbRunJsCallback(RunJsCallback);
+        internal static readonly mbGetCookieCallback s_mbGetCookieCallback = new mbGetCookieCallback(GetCookieCallback);
+        internal static readonly mbGetSourceCallback s_mbGetSourceCallback = new mbGetSourceCallback(GetSourceCallback);
         internal static IntPtr CreateToken()
         {
-            return (IntPtr)Interlocked.Increment(ref seed);
+            return (IntPtr)Interlocked.Increment(ref s_seed);
         }
         internal static void RunJsCallback(mbWebView webview, IntPtr token, mbJsExecState es, mbJsValue v)
         {
             RetValue retValue = new RetValue(webview, token, es, v);
-            if (_runJsCallbackDict.TryRemove(token, out var taskCompletionSource))
+            if (s_runJsCallbackDict.TryRemove(token, out TaskCompletionSource<RetValue> taskCompletionSource))
             {
                 taskCompletionSource.SetResult(retValue);
             }
@@ -34,20 +35,20 @@ namespace Raindrops.UI.WebView.Miniblink
         public static Task<RetValue> RunJs(this IMiniblinkProxy miniblinkProxy, string js, bool isInClosure)
         {
             mbWebView mbWebView = miniblinkProxy.WebView;
-            return RunJs(mbWebView, mbWebView.GetMainFrame(), js, isInClosure);
+            return RunJs(miniblinkProxy, mbWebView.GetMainFrame(), js, isInClosure);
         }
 
-        public static Task<RetValue> RunJs(mbWebView mbWebView, mbWebFrameHandle mbWebFrameHandle, string js, bool isInClosure)
+        public static Task<RetValue> RunJs(this IMiniblinkProxy miniblinkProxy, mbWebFrameHandle mbWebFrameHandle, string js, bool isInClosure)
         {
             IntPtr token = CreateToken();
             var taskSource = new TaskCompletionSource<RetValue>();
-            _runJsCallbackDict.TryAdd(token, taskSource);
-            mbWebView.RunJs(mbWebFrameHandle, js, isInClosure, _mbRunJsCallback, token);
+            s_runJsCallbackDict.TryAdd(token, taskSource);
+            miniblinkProxy.WebView.RunJs(mbWebFrameHandle, js, isInClosure, s_mbRunJsCallback, token);
             return taskSource.Task;
         }
         internal static void GetCookieCallback(mbWebView webview, IntPtr token, MbAsynRequestState state, string cookie)
         {
-            if (_getCookieCallbackDict.TryRemove(token, out var taskCompletionSource))
+            if (s_getStringCallbackDict.TryRemove(token, out TaskCompletionSource<string> taskCompletionSource))
             {
                 taskCompletionSource.SetResult(state == MbAsynRequestState.kMbAsynRequestStateOk ? cookie : null);
             }
@@ -57,8 +58,24 @@ namespace Raindrops.UI.WebView.Miniblink
             mbWebView mbWebView = miniblinkProxy.WebView;
             IntPtr token = CreateToken();
             var taskSource = new TaskCompletionSource<string>();
-            _getCookieCallbackDict.TryAdd(token, taskSource);
-            mbWebView.GetCookie(_mbGetCookieCallback, token);
+            s_getStringCallbackDict.TryAdd(token, taskSource);
+            mbWebView.GetCookie(s_mbGetCookieCallback, token);
+            return taskSource.Task;
+        }
+        internal static void GetSourceCallback(mbWebView webview, IntPtr token, string mhtml)
+        {
+            if (s_getStringCallbackDict.TryRemove(token, out TaskCompletionSource<string> taskCompletionSource))
+            {
+                taskCompletionSource.SetResult(mhtml);
+            }
+        }
+        public static Task<string> GetSource(this IMiniblinkProxy miniblinkProxy)
+        {
+            mbWebView mbWebView = miniblinkProxy.WebView;
+            IntPtr token = CreateToken();
+            var taskSource = new TaskCompletionSource<string>();
+            s_getStringCallbackDict.TryAdd(token, taskSource);
+            mbWebView.GetSource(s_mbGetSourceCallback, token);
             return taskSource.Task;
         }
     }

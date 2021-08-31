@@ -22,7 +22,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
         public long fileLength;
         public mbMemBuf GetData()
         {
-            return (IntPtr)data == IntPtr.Zero ? default : *data;
+            return (IntPtr)data == default ? default : *data;
         }
     }
 

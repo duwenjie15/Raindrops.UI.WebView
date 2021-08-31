@@ -11,6 +11,6 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
             => new mbStringPtr() { _handle = ptr };
         public static implicit operator IntPtr(mbStringPtr value)
             => value._handle;
-        public string GetString() => NativeMethods.mbGetString(_handle);
+        public string GetString() => _handle == default ? null : NativeMethods.mbGetString(_handle);
     }
 }

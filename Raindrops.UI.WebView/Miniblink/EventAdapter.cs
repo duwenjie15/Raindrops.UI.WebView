@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using Raindrops.Shared.InvokeST;
 using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
 
 namespace Raindrops.UI.WebView.Miniblink
@@ -9,13 +8,13 @@ namespace Raindrops.UI.WebView.Miniblink
     public class EventAdapter<TEventArgs, TCallback> : IDisposable where TEventArgs : EventArgs where TCallback : Delegate
     {
         public delegate void Handler(object sender, TEventArgs eventArgs);
-        private static readonly object _synRoot = new object();
-        private static DynamicMethod _bridgeMethod = null;
+        private static readonly object s_synRoot = new object();
+        private static DynamicMethod s_bridgeMethod = null;
         private readonly Func<mbWebView, TCallback, IntPtr, bool> _func;
         private readonly IMiniblinkProxy _miniblinkProxy;
         private TCallback _callback;
         private Handler _handler;
-        private bool disposedValue;
+        private bool _disposedValue;
         public EventAdapter(IMiniblinkProxy miniblinkProxy, Action<mbWebView, TCallback, IntPtr> action)
         {
             _func = (a, b, c) => { action(a, b, c); return true; };
@@ -57,9 +56,9 @@ namespace Raindrops.UI.WebView.Miniblink
         private TCallback BuildDynamicMethods()
         {
             DynamicMethod dynamicMethod = null;
-            lock (_synRoot)
+            lock (s_synRoot)
             {
-                dynamicMethod = _bridgeMethod ?? (_bridgeMethod = BuildBridge());
+                dynamicMethod = s_bridgeMethod ?? (s_bridgeMethod = BuildBridge());
             }
             return (TCallback)dynamicMethod.CreateDelegate(typeof(TCallback), this);
         }
@@ -84,10 +83,10 @@ namespace Raindrops.UI.WebView.Miniblink
             Label end = iLGenerator.DefineLabel();
             //Read handler
             //Push this to stack
-            iLGenerator.PushThisRef(this.GetType(), out _);
-            iLGenerator.PushField(GetType().GetField(nameof(_handler), BindingFlags.NonPublic | BindingFlags.Instance));
-            iLGenerator.PopLocal(handler);
-            iLGenerator.PushLocal(handler);
+            iLGenerator.PushThisCallRefWithObject(GetType());
+            iLGenerator.Push(GetType().GetField(nameof(_handler), BindingFlags.NonPublic | BindingFlags.Instance));
+            iLGenerator.Pop(handler);
+            iLGenerator.Push(handler);
             iLGenerator.Emit(OpCodes.Brfalse_S, end);
 
             //New eventObj
@@ -119,21 +118,21 @@ namespace Raindrops.UI.WebView.Miniblink
                 if (map.MemberInfo is PropertyInfo propertyInfo)
                 {
                     iLGenerator.Convert(sType, propertyInfo.PropertyType);
-                    iLGenerator.Call(propertyInfo.GetSetMethod());
+                    iLGenerator.Call(propertyInfo.GetSetMethod(true));
                 }
                 else if (map.MemberInfo is FieldInfo fieldInfo)
                 {
                     iLGenerator.Convert(sType, fieldInfo.FieldType);
-                    iLGenerator.PopField(fieldInfo);
+                    iLGenerator.Pop(fieldInfo);
                 }
             }
 
-            iLGenerator.PopLocal(eventObj);
+            iLGenerator.Pop(eventObj);
 
-            iLGenerator.PushLocal(handler);
-            iLGenerator.PushThisRef(this.GetType(), out _);
-            iLGenerator.PushField(GetType().GetField(nameof(_miniblinkProxy), BindingFlags.NonPublic | BindingFlags.Instance));
-            iLGenerator.PushLocal(eventObj);
+            iLGenerator.Push(handler);
+            iLGenerator.PushThisCallRefWithObject(GetType());
+            iLGenerator.Push(GetType().GetField(nameof(_miniblinkProxy), BindingFlags.NonPublic | BindingFlags.Instance));
+            iLGenerator.Push(eventObj);
             iLGenerator.Call(typeof(Handler).GetMethod(nameof(Handler.Invoke)));
 
             foreach (Map map in maps)
@@ -141,7 +140,7 @@ namespace Raindrops.UI.WebView.Miniblink
                 if (map.IsRef)
                 {
                     iLGenerator.PushArgument(map.ParameterIndex + 1);
-                    iLGenerator.PushLocal(eventObj);
+                    iLGenerator.Push(eventObj);
 
                     if (map.MemberInfo is PropertyInfo propertyInfo)
                     {
@@ -159,10 +158,10 @@ namespace Raindrops.UI.WebView.Miniblink
 
             if (retMap != null && methodInfo.ReturnType != typeof(void))
             {
-                iLGenerator.PushLocal(eventObj);
+                iLGenerator.Push(eventObj);
                 if (retMap.MemberInfo is PropertyInfo propertyInfo)
                 {
-                    iLGenerator.Call(propertyInfo.GetGetMethod());
+                    iLGenerator.Call(propertyInfo.GetGetMethod(true));
                     iLGenerator.Convert(propertyInfo.PropertyType, methodInfo.ReturnType);
                 }
                 else if (retMap.MemberInfo is FieldInfo fieldInfo)
@@ -182,14 +181,14 @@ namespace Raindrops.UI.WebView.Miniblink
         }
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
 
                 }
                 _func(_miniblinkProxy.WebView, null, IntPtr.Zero);
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
         public void Dispose()

@@ -33,11 +33,11 @@ namespace Raindrops.UI.WebView.Miniblink
             object[] objs = memberInfo.GetCustomAttributes(type, inherit);
             return objs.Length > 0 ? objs[0] : null;
         }
-        private static readonly BindingFlags _flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-        private static readonly ConcurrentDictionary<Type, Map[]> _mapsDict = new ConcurrentDictionary<Type, Map[]>();
+        private const BindingFlags AllFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        private static readonly ConcurrentDictionary<Type, Map[]> s_mapsDict = new ConcurrentDictionary<Type, Map[]>();
         private static IEnumerable<MemberInfo> GetMemberInfos(Type type)
         {
-            foreach (PropertyInfo p in type.GetProperties(_flags))
+            foreach (PropertyInfo p in type.GetProperties(AllFlags))
             {
                 if (p.CanWrite)
                 {
@@ -46,7 +46,7 @@ namespace Raindrops.UI.WebView.Miniblink
                     yield return p;
                 }
             }
-            foreach (FieldInfo d in type.GetFields(_flags))
+            foreach (FieldInfo d in type.GetFields(AllFlags))
             {
                 if (d.GetCustomAttribute(typeof(MapIgnoreAttribute), false) is MapIgnoreAttribute)
                     continue;
@@ -68,7 +68,7 @@ namespace Raindrops.UI.WebView.Miniblink
                 index = 0;
                 return false;
             }
-            if (_mapsDict.TryGetValue(type, out Map[] value))
+            if (s_mapsDict.TryGetValue(type, out Map[] value))
                 return value;
             List<Map> maps = new List<Map>();
             foreach (MemberInfo memberInfo in GetMemberInfos(type))
@@ -99,7 +99,7 @@ namespace Raindrops.UI.WebView.Miniblink
                 }
             }
             Map[] result = maps.ToArray();
-            _mapsDict.AddOrUpdate(type, result, (k, v) => v);
+            s_mapsDict.AddOrUpdate(type, result, (k, v) => v);
             return result;
         }
     }

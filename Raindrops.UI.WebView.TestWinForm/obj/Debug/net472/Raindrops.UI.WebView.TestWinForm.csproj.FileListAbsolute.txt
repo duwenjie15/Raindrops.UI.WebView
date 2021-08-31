@@ -1,0 +1,15 @@
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\bin\Debug\net472\Raindrops.UI.WebView.TestWinForm.exe.config
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\bin\Debug\net472\Raindrops.UI.WebView.TestWinForm.exe
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\bin\Debug\net472\Raindrops.UI.WebView.TestWinForm.pdb
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\bin\Debug\net472\Raindrops.UI.WebView.dll
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\bin\Debug\net472\Raindrops.UI.WebView.pdb
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.csproj.AssemblyReference.cache
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.Browser.resources
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.Form1.resources
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.csproj.GenerateResource.cache
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.AssemblyInfoInputs.cache
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.AssemblyInfo.cs
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.csproj.CoreCompileInputs.cache
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.csproj.CopyComplete
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.exe
+D:\Users\CoCoCoser\Desktop\Result\Raindrops.UI.WebView.TestWinForm\obj\Debug\net472\Raindrops.UI.WebView.TestWinForm.pdb

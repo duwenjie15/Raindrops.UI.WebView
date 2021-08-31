@@ -10,7 +10,6 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     {
         public const CallingConvention MB_CALL_TYPE = CallingConvention.StdCall;
         public const string MbDllPath = "mb.dll";
-        public const string NodeDllPath = "node.dll";
     }
     [StructLayout(LayoutKind.Sequential)]
     public struct mbRect
@@ -99,12 +98,9 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     {
         public mbProxy proxy;
         public mbSettingMask mask;
-        public mbOnBlinkThreadInitCallback blinkThreadInitCallback;
-        public IntPtr blinkThreadInitCallbackParam;
-        public IntPtr version;
-        [MarshalAs(UnmanagedType.LPWStr)]
-        public string mainDllPath;
-        public IntPtr mainDllHanlde;
+        [MarshalAs(UnmanagedType.FunctionPtr)]
+        internal mbOnBlinkThreadInitCallback blinkThreadInitCallback;
+        public IntPtr blinkThreadInitparam;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -114,8 +110,8 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public uint bgColor;
     }
 
-    public delegate int mbCookieVisitor(IntPtr @params, [In, MarshalAs(UnmanagedType.LPStr)] string name, [In, MarshalAs(UnmanagedType.LPStr)] string value, [In, MarshalAs(UnmanagedType.LPStr)] string domain,
-        [In, MarshalAs(UnmanagedType.LPStr)] string path,   // If |path| is non-empty only URLs at or below the path will get the cookie value.
+    public delegate int mbCookieVisitor(IntPtr @params,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string name,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string value,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string domain,
+         [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string path,   // If |path| is non-empty only URLs at or below the path will get the cookie value.
         int secure,                                         // If |secure| is true the cookie will only be sent for HTTPS requests.
         int httpOnly,                                       // If |httponly| is true the cookie will only be sent for HTTP requests.
         ref int expires                                     // The cookie expiration date is only valid if |has_expires| is true.
@@ -429,7 +425,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
     public delegate int mbNavigationCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public unsafe delegate IntPtr mbCreateViewCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In] ref mbWindowFeatures windowFeatures);
+    public unsafe delegate IntPtr mbCreateViewCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In]ref mbWindowFeatures windowFeatures);
 
 
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
@@ -458,7 +454,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbLoadingFinishCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbLoadingResult result, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string failedReason);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbDownloadCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId, [In, MarshalAs(UnmanagedType.LPStr)] string url, IntPtr downloadJob);
+    public delegate int mbDownloadCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, IntPtr downloadJob);
     public enum mbConsoleLevel
     {
         mbLevelDebug = 4,
@@ -480,11 +476,11 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
     //mbNet--------------------------------------------------------------------------------------
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate bool mbLoadUrlBeginCallback(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string url, mbNetJob job);
+    public delegate int mbLoadUrlBeginCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbLoadUrlEndCallback(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string url, mbNetJob job, IntPtr buf, int len);
+    public delegate void mbLoadUrlEndCallback(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job, IntPtr buf, int len);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbLoadUrlFailCallback(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string url, mbNetJob job);
+    public delegate void mbLoadUrlFailCallback(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job);
 
 
     //[UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
@@ -515,7 +511,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbOnUrlRequestDidReceiveResponseCallback(mbWebView webview, IntPtr param, mbWebUrlRequestPtr request, mbWebUrlResponsePtr response);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbOnUrlRequestDidReceiveDataCallback(mbWebView webview, IntPtr param, mbWebUrlRequestPtr request, [In, MarshalAs(UnmanagedType.LPStr)] string data, int dataLength);
+    public delegate void mbOnUrlRequestDidReceiveDataCallback(mbWebView webview, IntPtr param, mbWebUrlRequestPtr request,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string data, int dataLength);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbOnUrlRequestDidFailCallback(mbWebView webview, IntPtr param, mbWebUrlRequestPtr request, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string error);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
@@ -536,7 +532,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         kMbDownloadOptCacheData,
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbNetJobDataRecvCallback(IntPtr ptr, mbNetJob job, [In, MarshalAs(UnmanagedType.LPStr)] string data, int length);
+    public delegate void mbNetJobDataRecvCallback(IntPtr ptr, mbNetJob job,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string data, int length);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbNetJobDataFinishCallback(IntPtr ptr, mbNetJob job, mbLoadingResult result);
     [StructLayout(LayoutKind.Sequential)]
@@ -558,7 +554,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     }
 
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate mbDownloadOpt mbDownloadInBlinkThreadCallback(mbWebView webview, IntPtr param, IntPtr expectedContentLength, [In, MarshalAs(UnmanagedType.LPStr)] string url, [In, MarshalAs(UnmanagedType.LPStr)] string mime, [In, MarshalAs(UnmanagedType.LPStr)] string disposition, mbNetJob job, [In] ref mbNetJobDataBind dataBind);
+    public delegate mbDownloadOpt mbDownloadInBlinkThreadCallback(mbWebView webview, IntPtr param, IntPtr expectedContentLength,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string mime,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string disposition, mbNetJob job, [In]ref mbNetJobDataBind dataBind);
     [StructLayout(LayoutKind.Sequential)]
     public struct mbPdfDatas
     {
@@ -567,7 +563,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public IntPtr datas;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbPrintPdfDataCallback(mbWebView webview, IntPtr param, [In] ref mbPdfDatas datas);
+    public delegate void mbPrintPdfDataCallback(mbWebView webview, IntPtr param, [In]ref mbPdfDatas datas);
     [StructLayout(LayoutKind.Sequential)]
     public struct mbScreenshotSettings
     {
@@ -576,9 +572,9 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public int height;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbPrintBitmapCallback(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string data, IntPtr size);
+    public delegate void mbPrintBitmapCallback(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string data, IntPtr size);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbOnScreenshot(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string data, IntPtr size);
+    public delegate void mbOnScreenshot(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string data, IntPtr size);
     public enum mbHttBodyElementType
     {
         mbHttBodyElementTypeData,
@@ -604,7 +600,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public bool draggable;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate void mbDraggableRegionsChangedCallback(mbWebView webview, IntPtr param, [In] ref mbDraggableRegion rects, int rectCount);
+    public delegate void mbDraggableRegionsChangedCallback(mbWebView webview, IntPtr param,[In] ref mbDraggableRegion rects, int rectCount);
     public enum mbPrintintStep
     {
         kPrintintStepStart,
@@ -620,9 +616,9 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public float scale;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbPrintingCallback(mbWebView webview, IntPtr param, mbPrintintStep step, IntPtr hDC, [In] ref mbPrintintSettings settings, int pageCount);
+    public delegate int mbPrintingCallback(mbWebView webview, IntPtr param, mbPrintintStep step, IntPtr hDC,[In] ref mbPrintintSettings settings, int pageCount);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate mbStringPtr mbImageBufferToDataURLCallback(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPStr)] string data, size_t size);
+    public delegate mbStringPtr mbImageBufferToDataURLCallback(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string data, size_t size);
     [StructLayout(LayoutKind.Sequential)]
     public struct tagRECT
     {
@@ -634,7 +630,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     public partial class NativeMethods
     {
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE)]
-        public static extern unsafe void mbInit([In] ref mbSettings mbSettings);
+        public static extern unsafe void mbInit(ref mbSettings mbSettings);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbUninit")]
         public static extern void mbUninit();
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbCreateWebView")]
@@ -671,7 +667,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbSetProxy")]
         public static extern void mbSetProxy(mbWebView webview, ref mbProxy proxy);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbSetDebugConfig")]
-        public static extern void mbSetDebugConfig(mbWebView webview, [In, MarshalAs(UnmanagedType.LPStr)] string debugString, [In, MarshalAs(UnmanagedType.LPStr)] string param);
+        public static extern void mbSetDebugConfig(mbWebView webview,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string debugString,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string param);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetSetData")]
 
 
@@ -679,7 +675,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetHookRequest")]
         public static extern void mbNetHookRequest(mbNetJob jobPtr);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetChangeRequestUrl")]
-        public static extern void mbNetChangeRequestUrl(mbNetJob jobPtr, [In, MarshalAs(UnmanagedType.LPStr)] string url);
+        public static extern void mbNetChangeRequestUrl(mbNetJob jobPtr,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetContinueJob")]
         public static extern void mbNetContinueJob(mbNetJob jobPtr);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetGetRawHttpHeadInBlinkThread")]
@@ -689,7 +685,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetHoldJobToAsynCommit")]
         public static extern bool mbNetHoldJobToAsynCommit(mbNetJob jobPtr);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetCancelRequest")]
-        public static extern void mbNetCancelRequest(mbNetJob jobPtr);
+        public static extern void mbNetCancelRequest(mbNetJob jobPtr); 
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetOnResponse")]
         public static extern void mbNetOnResponse(mbWebView webview, mbNetResponseCallback callback, IntPtr param);
 
@@ -697,7 +693,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetSetWebsocketCallback")]
         public static extern void mbNetSetWebsocketCallback(mbWebView webview, ref mbWebsocketHookCallbacks callbacks, IntPtr param);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetSendWsText")]
-        public static extern void mbNetSendWsText(IntPtr channel, [In, MarshalAs(UnmanagedType.LPStr)] string buf, size_t len);
+        public static extern void mbNetSendWsText(IntPtr channel,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string buf, size_t len);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetSendWsBlob")]
         public static extern void mbNetSendWsBlob(IntPtr channel, IntPtr buf, size_t len);
 
@@ -741,11 +737,11 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
 
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetSetMIMEType")]
-        public static extern void mbNetSetMIMEType(mbNetJob jobPtr, [In, MarshalAs(UnmanagedType.LPStr)] string type);
+        public static extern void mbNetSetMIMEType(mbNetJob jobPtr,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string type);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetGetMIMEType")]
         public static extern IntPtr mbNetGetMIMEType(mbNetJob jobPtr);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetGetHTTPHeaderField")]
-        public static extern IntPtr mbNetGetHTTPHeaderField(mbNetJob job, [In, MarshalAs(UnmanagedType.LPStr)] string key, [MarshalAs(UnmanagedType.Bool)] bool fromRequestOrResponse);
+        public static extern IntPtr mbNetGetHTTPHeaderField(mbNetJob job,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string key, [MarshalAs(UnmanagedType.Bool)] bool fromRequestOrResponse);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbNetSetHTTPHeaderField")]
         public static extern void mbNetSetHTTPHeaderField(mbNetJob jobPtr, [In, MarshalAs(UnmanagedType.LPWStr)] string key, [In, MarshalAs(UnmanagedType.LPWStr)] string value, [MarshalAs(UnmanagedType.Bool)] bool response);
 
@@ -1020,7 +1016,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
 
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbSetDeviceParameter")]
-        public static extern void mbSetDeviceParameter(mbWebView webview, [In, MarshalAs(UnmanagedType.LPStr)] string device, [In, MarshalAs(UnmanagedType.LPStr)] string paramStr, int paramInt, float paramFloat);
+        public static extern void mbSetDeviceParameter(mbWebView webview,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string device,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string paramStr, int paramInt, float paramFloat);
 
 
 
@@ -1034,7 +1030,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
 
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbUtilCreateRequestCode")]
-        public static extern IntPtr mbUtilCreateRequestCode([In, MarshalAs(UnmanagedType.LPStr)] string registerInfo);
+        public static extern IntPtr mbUtilCreateRequestCode( [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string registerInfo);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbUtilIsRegistered")]
         public static extern void mbUtilIsRegistered([In, MarshalAs(UnmanagedType.LPWStr)] string defaultPath);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbUtilPrint")]
@@ -1068,11 +1064,11 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public static extern void mbUtilScreenshot(mbWebView webview, ref mbScreenshotSettings settings, mbOnScreenshot callback, IntPtr param);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbPopupDownloadMgr")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool mbPopupDownloadMgr(mbWebView webview, [In, MarshalAs(UnmanagedType.LPStr)] string url, IntPtr downloadJob);
+        public static extern bool mbPopupDownloadMgr(mbWebView webview,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, IntPtr downloadJob);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbPopupDialogAndDownload")]
-        public static extern mbDownloadOpt mbPopupDialogAndDownload(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.SysUInt)] uint contentLength, [In, MarshalAs(UnmanagedType.LPStr)] string url, [In, MarshalAs(UnmanagedType.LPStr)] string mime, [In, MarshalAs(UnmanagedType.LPStr)] string disposition, IntPtr job, ref mbNetJobDataBind dataBind, ref mbDownloadBind callbackBind);
+        public static extern mbDownloadOpt mbPopupDialogAndDownload(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.SysUInt)] uint contentLength,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string mime,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string disposition, IntPtr job, ref mbNetJobDataBind dataBind, ref mbDownloadBind callbackBind);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbDownloadByPath")]
-        public static extern mbDownloadOpt mbDownloadByPath(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPWStr)] string path, [MarshalAs(UnmanagedType.SysUInt)] uint contentLength, [In, MarshalAs(UnmanagedType.LPStr)] string url, [In, MarshalAs(UnmanagedType.LPStr)] string mime, [In, MarshalAs(UnmanagedType.LPStr)] string disposition, IntPtr job, ref mbNetJobDataBind dataBind, ref mbDownloadBind callbackBind);
+        public static extern mbDownloadOpt mbDownloadByPath(mbWebView webview, IntPtr param, [In, MarshalAs(UnmanagedType.LPWStr)] string path, [MarshalAs(UnmanagedType.SysUInt)] uint contentLength,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string mime,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string disposition, IntPtr job, ref mbNetJobDataBind dataBind, ref mbDownloadBind callbackBind);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbGetPdfPageData")]
         public static extern void mbGetPdfPageData(mbWebView webview, mbOnGetPdfPageDataCallback callback, IntPtr param);
         [DllImport(NativeConstants.MbDllPath, CallingConvention = NativeConstants.MB_CALL_TYPE, EntryPoint = "mbCreateMemBuf")]

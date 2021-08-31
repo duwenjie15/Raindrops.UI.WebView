@@ -7,6 +7,10 @@ namespace Raindrops.UI.WebView.Miniblink.Event
 {
     public class LoadUrlBeginEventArgs : EventArgs
     {
+        public LoadUrlBeginEventArgs()
+        {
+
+        }
         [Map(Name = "url")]
         public string Url { get; set; }
         [Map(Name = "job")]

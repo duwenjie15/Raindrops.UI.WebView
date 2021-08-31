@@ -16,7 +16,8 @@ namespace Raindrops.UI.WebView.Miniblink.Event
         public IntPtr Buffer { get; set; }
         [Map(Name = "len")]
         public int Len { get; set; }
-        private byte[] data;
+        [Map(Name = "data")]
+        private byte[] _data;
         public byte[] Data
         {
             get
@@ -25,11 +26,11 @@ namespace Raindrops.UI.WebView.Miniblink.Event
                 {
                     if (Buffer == IntPtr.Zero || Len <= 0)
                         return null;
-                    if (data != null)
-                        return data;
-                    data = new byte[Len];
-                    Marshal.Copy(Buffer, data, 0, Len);
-                    return data;
+                    if (_data != null)
+                        return _data;
+                    _data = new byte[Len];
+                    Marshal.Copy(Buffer, _data, 0, Len);
+                    return _data;
                 }
             }
         }

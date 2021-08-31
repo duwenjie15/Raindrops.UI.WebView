@@ -270,24 +270,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\CoCoCoser\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\63578\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\Raindrops.UI.WebView.TestWPF.csproj",
+      "projectUniqueName": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\Raindrops.UI.WebView.TestWPF.csproj",
       "projectName": "Raindrops.UI.WebView.TestWPF",
-      "projectPath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\Raindrops.UI.WebView.TestWPF.csproj",
-      "packagesPath": "C:\\Users\\CoCoCoser\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\obj\\",
+      "projectPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\Raindrops.UI.WebView.TestWPF.csproj",
+      "packagesPath": "C:\\Users\\63578\\.nuget\\packages\\",
+      "outputPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWPF\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\CoCoCoser\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\63578\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -295,15 +290,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\CoCoCoser\\Desktop\\Mapper\\Raindrops\\Raindrops\\Raindrops.Builder\\bin": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
-              "projectPath": "C:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
+            "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
+              "projectPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
             }
           }
         }
@@ -335,7 +329,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.301\\RuntimeIdentifierGraph.json"
       }
     }
   }

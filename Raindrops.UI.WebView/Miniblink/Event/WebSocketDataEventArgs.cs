@@ -19,8 +19,8 @@ namespace Raindrops.UI.WebView.Miniblink.Event
         public int OpCpodem { get; set; }
         [Map(Name = "isContinue")]
         public bool IsContinue { get; set; }
-        private IntPtr buf;
-        private int len;
+        private IntPtr buf { get; set; }
+        private int len { get; set; }
         public byte[] GetBuffer()
         {
             if(buf != default && len >= 0)
