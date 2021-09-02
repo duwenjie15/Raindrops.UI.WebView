@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="Browser.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Update="Form1.cs">
       <SubType>Form</SubType>

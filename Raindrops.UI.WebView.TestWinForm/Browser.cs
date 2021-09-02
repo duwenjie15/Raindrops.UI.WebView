@@ -1,19 +1,19 @@
-﻿using Raindrops.UI.WebView;
-using Raindrops.UI.WebView.Miniblink;
-using Raindrops.UI.WebView.Miniblink.Event;
-using Raindrops.UI.WebView.Miniblink.PInvoke;
-using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Raindrops.UI.WebView.Miniblink;
+using Raindrops.UI.WebView.Miniblink.Event;
+using Raindrops.UI.WebView.Miniblink.PInvoke;
+using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
 
 namespace Raindrops.UI.WebView.TestWinForm
 {
-    public partial class Browser : UserControl, IMiniblinkProxy
+    public partial class Browser : Control, IMiniblinkProxy
     {
+        private readonly mbPaintUpdatedCallback _mbPaintUpdatedCallback;
         private readonly mbPaintBitUpdatedCallback _mbPaintBitUpdatedCallback;
         private mbWebsocketHookCallbacks _mbWebsocketHookCallbacks;
         private Bitmap _image;
@@ -32,12 +32,13 @@ namespace Raindrops.UI.WebView.TestWinForm
         public EventAdapter<LoadUrlEndEventArgs, mbLoadUrlEndCallback> LoadUrlEnd;
         public EventAdapter<DocumentReadyEventArgs, mbDocumentReadyCallback> DocumentReady;
         public EventAdapter<OnJsQueryEventArgs, mbJsQueryCallback> JsQuery;
+        public EventAdapter<DownloadEventArgs, mbDownloadCallback> DownLoad;
+        public EventAdapter<DownloadDownloadInBlinkThreadEventArg, mbDownloadInBlinkThreadCallback> DownLoadInBlinkThread;
         public Browser()
         {
             InitializeComponent();
             if (IsDesignMode) return;
             WebView = mbWebView.Create();
-            if (!IsHandleCreated) CreateHandle();
 
             TitleChanged = new EventAdapter<TitleChangeEventArgs, mbTitleChangedCallback>(this, NativeMethods.mbOnTitleChanged);
             UrlChanged = new EventAdapter<UrlChangeEventArgs, mbURLChangedCallback>(this, NativeMethods.mbOnURLChanged);
@@ -51,39 +52,63 @@ namespace Raindrops.UI.WebView.TestWinForm
             LoadUrlEnd = new EventAdapter<LoadUrlEndEventArgs, mbLoadUrlEndCallback>(this, NativeMethods.mbOnLoadUrlEnd);
             DocumentReady = new EventAdapter<DocumentReadyEventArgs, mbDocumentReadyCallback>(this, NativeMethods.mbOnDocumentReady);
             JsQuery = new EventAdapter<OnJsQueryEventArgs, mbJsQueryCallback>(this, NativeMethods.mbOnJsQuery);
-
-            if (!IsHandleCreated) CreateHandle();
-            NativeMethods.mbSetAutoDrawToHwnd(WebView, false);
+            DownLoad = new EventAdapter<DownloadEventArgs, mbDownloadCallback>(this, NativeMethods.mbOnDownload);
+            DownLoadInBlinkThread = new EventAdapter<DownloadDownloadInBlinkThreadEventArg, mbDownloadInBlinkThreadCallback>(this, NativeMethods.mbOnDownloadInBlinkThread);
+            _mbPaintUpdatedCallback = new mbPaintUpdatedCallback(OnPaintUpdate);
             _mbPaintBitUpdatedCallback = new mbPaintBitUpdatedCallback(mbPaintBitUpdated);
-            NativeMethods.mbOnPaintBitUpdated(WebView, _mbPaintBitUpdatedCallback, IntPtr.Zero);
+
+            NativeMethods.mbSetAutoDrawToHwnd(WebView, true);
+            NativeMethods.mbOnPaintUpdated(WebView, _mbPaintUpdatedCallback, IntPtr.Zero);
+            //NativeMethods.mbOnPaintBitUpdated(WebView, _mbPaintBitUpdatedCallback, IntPtr.Zero);
+            if (!IsHandleCreated) CreateHandle();
             WebView.SetHandle(Handle);
             ImeContext.SetImeStatus(ImeMode.NoControl, Handle);
             ImeMode = ImeMode.Off;
             Disposed += Browser_Disposed;
             DoubleBuffered = true;
         }
+        public bool IsBeginDraw { get; set; }
+        public bool Simulate { get; set; }
+        public mbWebView WebView { get; private set; }
+        public bool IsDesignMode
+        {
+            get
+            {
+                string processName = Process.GetCurrentProcess().ProcessName;
+                return DesignMode || processName.Contains("devenv") || processName.Contains("DesignToolsServer");
+            }
+        }
         public void mbPaintBitUpdated(mbWebView webview, IntPtr param, IntPtr buffer, ref mbRect r, int width, int height)
         {
+            Bitmap image;
             if (_image == null || _image.Width < width || _image.Height < height)
             {
                 lock (this)
+                {
                     _image = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+                    _drawSize = new Size(width, height);
+                    image = _image;
+                }
             }
-            _drawSize = new Size(width, height);
-            //计算更新区域
-            var rect = new Rectangle
+            else
             {
-                X = r.x >= width ? width - 1 : r.x,
-                Y = r.y >= height ? height - 1 : r.y
-            };
-            rect.Width = rect.X + r.w > width ? width - rect.X : r.w;
-            rect.Height = rect.Y + r.h > height ? height - rect.Y : r.h;
-
-            BitmapData bitmapData = _image.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            IntPtr ptr = bitmapData.Scan0;
+                image = _image;
+            }
             unsafe
             {
-                int targetStride = _image.Width;
+                //计算更新区域
+                var rect = new Rectangle
+                {
+                    X = r.x >= width ? width - 1 : r.x,
+                    Y = r.y >= height ? height - 1 : r.y
+                };
+                rect.Width = rect.X + r.w > width ? width - rect.X : r.w;
+                rect.Height = rect.Y + r.h > height ? height - rect.Y : r.h;
+
+                BitmapData bitmapData = image.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                IntPtr ptr = bitmapData.Scan0;
+
+                int targetStride = image.Width;
                 int sourceStride = width;
                 int* target = (int*)ptr;
                 int* source = (int*)buffer;
@@ -98,17 +123,15 @@ namespace Raindrops.UI.WebView.TestWinForm
                         *(target + targetPix) = *(source + sourcePix);
                     }
                 }
+                _image.UnlockBits(bitmapData);
+
+                Invalidate(rect);
             }
-            _image.UnlockBits(bitmapData);
-
-
-            Invalidate();
         }
         private void Browser_Disposed(object sender, EventArgs e)
         {
             Close();
         }
-
         private void Close()
         {
             if (!_disposed)
@@ -123,21 +146,19 @@ namespace Raindrops.UI.WebView.TestWinForm
                     }
                 }
         }
-        public bool Simulate { get; set; }
-        public mbWebView WebView { get; private set; }
-        public bool IsDesignMode
-        {
-            get
-            {
-                string processName = Process.GetCurrentProcess().ProcessName;
-                return DesignMode || processName.Contains("devenv") || processName.Contains("DesignToolsServer");
-            }
-        }
         public void OnPaintUpdate(mbWebView webview, IntPtr param, IntPtr hdc, int x, int y, int cx, int cy)
         {
             if (!IsDisposed)
             {
-                using (Graphics graphics = CreateGraphics())
+                Bitmap bitmap = _image;
+                int cw = x + cx;
+                int ch = y + cy;
+                if (bitmap == default || bitmap.Width < cw || bitmap.Height < ch)
+                {
+                    bitmap = new Bitmap(Width > cw ? Width : cw, Height > ch ? Height : ch);
+                    _image = bitmap;
+                }
+                using (Graphics graphics = Graphics.FromImage(bitmap))
                 {
                     IntPtr ptr = graphics.GetHdc();
                     try
@@ -148,8 +169,15 @@ namespace Raindrops.UI.WebView.TestWinForm
                     {
                         graphics.ReleaseHdc(ptr);
                     }
+                    graphics.Save();
                 }
             }
+        }
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Bitmap bitmap = _image;
+            if (bitmap != null)
+                e.Graphics.DrawImage(bitmap, e.ClipRectangle, e.ClipRectangle, GraphicsUnit.Pixel);
         }
         [DllImport("gdi32.dll")]
         private static extern int BitBlt(
@@ -205,24 +233,6 @@ namespace Raindrops.UI.WebView.TestWinForm
             Font drawFont = new Font("Arial", 16);
             SolidBrush drawBrush = new SolidBrush(Color.Black);
             graphics.DrawString(message, drawFont, drawBrush, new Point(0, 0));
-        }
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            if (IsDesignMode)
-            {
-                DrawString(e.Graphics, nameof(Browser));
-            }
-            else if (Simulate)
-            {
-                DrawString(e.Graphics, "SimulateMode");
-            }
-            if (_image != default)
-            {
-                lock (this)
-                {
-                    e.Graphics.DrawImage(_image, 0, 0);
-                }
-            }
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -361,12 +371,11 @@ namespace Raindrops.UI.WebView.TestWinForm
         protected override void WndProc(ref Message m)
         {
             IntPtr result = IntPtr.Zero;
-
             switch (m.Msg)
             {
                 case Win32NativeMethods.WM_ERASEBKGND:
                     m.Result = ((IntPtr)1);
-                    break;
+                    return;
                 case Win32NativeMethods.WM_CONTEXTMENU:
                     int x = m.LParam.ToInt32() & 65535;
                     int y = m.LParam.ToInt32() >> 16;
@@ -386,10 +395,5 @@ namespace Raindrops.UI.WebView.TestWinForm
             }
             base.WndProc(ref m);
         }
-        //~Browser()
-        //{
-        //    WebView.SetHandle(IntPtr.Zero);
-        //    WebView.Destroy();
-        //}
     }
 }

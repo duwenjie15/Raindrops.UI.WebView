@@ -1,4 +1,5 @@
 ﻿using Raindrops.UI.WebView.Miniblink;
+using Raindrops.UI.WebView.Miniblink.PInvoke;
 using System;
 using System.IO;
 using System.Text;
@@ -30,9 +31,7 @@ namespace Raindrops.UI.WebView.TestWinForm
         {
             browser1 = new Browser() { Dock = DockStyle.Fill };
             browser1.KeyUp += browser1_KeyUp;
-            //var browser2 = new Browser() { Dock = DockStyle.Fill };
             tableLayoutPanel1.Controls.Add(browser1, 0, 1);
-            //tableLayoutPanel1.Controls.Add(browser2, 0, 2);
             browser1.TitleChanged.EventHandler += TitleChanged_EventHandler;
             browser1.LoadUrlBegin.EventHandler += LoadUrlBegin_EventHandler;
             browser1.WebSocketOnWillConnect.EventHandler += WebSocketOnWillConnect_EventHandler;
@@ -40,8 +39,18 @@ namespace Raindrops.UI.WebView.TestWinForm
             browser1.WebSocketOnSend.EventHandler += WebSocketOnSend_EventHandler;
             browser1.WebSocketOnReceive.EventHandler += WebSocketOnReceive_EventHandler;
             browser1.WebSocketOnError.EventHandler += WebSocketOnError_EventHandler;
-            //browser1.WebView.LoadUrl("app://./login.html");
+            browser1.DownLoad.EventHandler += DownLoad_EventHandler;
+            browser1.DownLoadInBlinkThread.EventHandler += DownLoadInBlinkThread_EventHandler;
             browser1.WebView.LoadUrl("http://www.baidu.com");
+        }
+        private void DownLoadInBlinkThread_EventHandler(object sender, Miniblink.Event.DownloadDownloadInBlinkThreadEventArg eventArgs)
+        {
+            mbDownloadBind mbDownloadBind = new mbDownloadBind();
+            eventArgs.mbDownloadOpt = NativeMethods.mbPopupDialogAndDownload(eventArgs.WebView, IntPtr.Zero, eventArgs.ExpectedContentLength, eventArgs.Url, eventArgs.Mime, eventArgs.Disposition, eventArgs.Job, eventArgs.DataBind, ref mbDownloadBind);
+        }
+        private void DownLoad_EventHandler(object sender, Miniblink.Event.DownloadEventArgs eventArgs)
+        {
+
         }
 
         private void WebSocketOnError_EventHandler(object sender, Miniblink.Event.WebSocketErrorEventArgs eventArgs)
@@ -84,22 +93,7 @@ namespace Raindrops.UI.WebView.TestWinForm
         }
         private void LoadUrlBegin_EventHandler(object sender, Miniblink.Event.LoadUrlBeginEventArgs eventArgs)
         {
-            string url = eventArgs.Url;
-            DirectoryInfo directoryInfo = new DirectoryInfo("app");
-            if (url.StartsWith("app://") && directoryInfo.Exists)
-            {
-                var fmd = url.Replace("app://", null).Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                string[] filePaths = new string[fmd.Length + 1];
-                filePaths[0] = directoryInfo.FullName;
-                Array.Copy(fmd, 0, filePaths, 1, fmd.Length);
-                string fileName = Path.Combine(filePaths);
-                if (File.Exists(fileName))
-                {
-                    eventArgs.Job.SetData(File.ReadAllBytes(fileName));
-                    return;
-                }
-            }
-            AppendLog($"未知Url" + url);
+            AppendLog($"Url->{eventArgs.Url}");
             //eventArgs.Result = true;
             //AppendLog($"OnLoadUrlBegin{eventArgs.Url}");
             //if(eventArgs.Url.Contains("aaaaaa"))

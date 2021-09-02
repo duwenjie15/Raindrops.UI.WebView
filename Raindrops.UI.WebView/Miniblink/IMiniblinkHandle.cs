@@ -2,6 +2,7 @@
 using Raindrops.UI.WebView.Miniblink.PInvoke.Handle;
 using System;
 using System.Collections.Concurrent;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -77,6 +78,43 @@ namespace Raindrops.UI.WebView.Miniblink
             s_getStringCallbackDict.TryAdd(token, taskSource);
             mbWebView.GetSource(s_mbGetSourceCallback, token);
             return taskSource.Task;
+        }
+        public static void SetCookie(this IMiniblinkProxy miniblinkProxy, string url, System.Net.Cookie cookie)
+        {
+            SetCookie(miniblinkProxy.WebView, url, cookie);
+        }
+        public static void SetCookie(mbWebView mbWebView, string url, System.Net.Cookie cookie)
+        {
+            if (string.IsNullOrEmpty(cookie.Name) || string.IsNullOrEmpty(cookie.Value))
+                return;
+            StringBuilder builder = new StringBuilder();
+            builder.Append(cookie.Name);
+            builder.Append('=');
+            builder.Append(cookie.Value);
+            if (cookie.Expires != default)
+            {
+                builder.Append("; expires=");
+                builder.Append(cookie.Expires.ToString("r"));
+            }
+            if (!string.IsNullOrEmpty(cookie.Path))
+            {
+                builder.Append("; path=");
+                builder.Append(cookie.Path);
+            }
+            if (!string.IsNullOrEmpty(cookie.Domain))
+            {
+                builder.Append("; domain=");
+                builder.Append(cookie.Domain);
+            }
+            if (cookie.HttpOnly)
+            {
+                builder.Append("; HttpOnly");
+            }
+            if (cookie.Secure)
+            {
+                builder.Append("; Secure");
+            }
+            mbWebView.SetCookie(url, builder.ToString());
         }
     }
 }

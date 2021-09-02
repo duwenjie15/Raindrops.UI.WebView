@@ -356,11 +356,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\Raindrops.UI.WebView.TestWinForm.csproj",
+      "projectUniqueName": "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\Raindrops.UI.WebView.TestWinForm.csproj",
       "projectName": "Raindrops.UI.WebView.TestWinForm",
-      "projectPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\Raindrops.UI.WebView.TestWinForm.csproj",
+      "projectPath": "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\Raindrops.UI.WebView.TestWinForm.csproj",
       "packagesPath": "C:\\Users\\63578\\.nuget\\packages\\",
-      "outputPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\obj\\",
+      "outputPath": "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView.TestWinForm\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "configFilePaths": [
@@ -379,16 +379,16 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
-              "projectPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
+            "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
+              "projectPath": "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
             }
           }
         },
         "net40": {
           "targetAlias": "net40",
           "projectReferences": {
-            "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
-              "projectPath": "D:\\Users\\CoCoCoser\\Desktop\\Github\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
+            "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj": {
+              "projectPath": "C:\\Users\\63578\\Documents\\GitHub\\Raindrops.UI.WebView\\Raindrops.UI.WebView\\Raindrops.UI.WebView.csproj"
             }
           }
         }

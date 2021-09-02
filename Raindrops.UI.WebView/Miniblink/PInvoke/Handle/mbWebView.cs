@@ -46,8 +46,6 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
         public bool FireWindowsMessage(IntPtr hWnd, uint message, IntPtr wParam, IntPtr lParam, ref IntPtr result) => NativeMethods.mbFireWindowsMessage(this, hWnd, message, wParam, lParam, ref result);
         public void SetHandleOffset(int x, int y) => NativeMethods.mbSetHandleOffset(this, x, y);
         public void Register() => NativeMethods.mbUtilIsRegistered(AppDomain.CurrentDomain.BaseDirectory);
-        public void ClearCookie() => NativeMethods.mbClearCookie(this);
-        public void PerformCookieCommand(mbCookieCommand command) => NativeMethods.mbPerformCookieCommand(this, command);
         public void Wake() => NativeMethods.mbWake(this);
         public mbWebFrameHandle GetMainFrame() => NativeMethods.mbWebFrameGetMainFrame(this);
         public void GetSource(mbGetSourceCallback requestCallback, IntPtr param) => NativeMethods.mbGetSource(this, requestCallback, param);
@@ -67,5 +65,12 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke.Handle
         public void Resize(int w, int h) => NativeMethods.mbResize(this, w, h);
         public void Destroy() => NativeMethods.mbDestroyWebView(this);
         public void RunJs(mbWebFrameHandle mbWebFrameHandle, string script, bool isInClosure, mbRunJsCallback mbRunJsCallback, IntPtr param) => NativeMethods.mbRunJs(this, mbWebFrameHandle, script, isInClosure, mbRunJsCallback, param, IntPtr.Zero);
+        public void SetUserAgent(string userAgent) => NativeMethods.mbSetUserAgent(this, userAgent);
+        public void SetCookie(string url, string cookie) => NativeMethods.mbSetCookie(this, url, cookie);
+        public void SetCookieEnabled(bool enable) => NativeMethods.mbSetCookieEnabled(this, enable);
+        public void SetCookieJarPath(string path) => NativeMethods.mbSetCookieJarPath(this, path);
+        public void SetCookieJarFullPath(string path) => NativeMethods.mbSetCookieJarFullPath(this, path);
+        public void ClearCookie() => NativeMethods.mbClearCookie(this);
+        public void PerformCookieCommand(mbCookieCommand command) => NativeMethods.mbPerformCookieCommand(this, command);
     }
 }

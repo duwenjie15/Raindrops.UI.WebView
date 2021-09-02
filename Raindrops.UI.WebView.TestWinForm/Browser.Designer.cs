@@ -33,8 +33,6 @@ namespace Raindrops.UI.WebView.TestWinForm
             // 
             // Browser
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "Browser";
             this.ResumeLayout(false);
 
