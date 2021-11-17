@@ -7,7 +7,7 @@ namespace Raindrops.UI.WebView.Miniblink.Event
 {
     public class OnJsQueryEventArgs : EventArgs
     {
-        [Map(Name = "webView")]
+        [Map(Name = "webview")]
         public mbWebView WebView { get; set; }
         [Map(Name = "param")]
         public IntPtr Param { get; set; }
