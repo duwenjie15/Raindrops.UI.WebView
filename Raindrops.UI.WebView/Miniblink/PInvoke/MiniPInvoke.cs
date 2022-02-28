@@ -357,7 +357,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
     public delegate mbStringPtr onWillConnect(mbWebView webView, IntPtr param, mbWebSocketChannel channel, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [MarshalAs(UnmanagedType.I1)] ref bool needHook);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
-    public delegate int onConnected(mbWebView webView, IntPtr param, mbWebSocketChannel channel);
+    public delegate bool onConnected(mbWebView webView, IntPtr param, mbWebSocketChannel channel);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
     public delegate mbStringPtr onReceive(mbWebView webView, IntPtr param, mbWebSocketChannel channel, int opCpodem, IntPtr buf, size_t len, [MarshalAs(UnmanagedType.I1)] ref bool isContinue);
     [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
@@ -417,13 +417,13 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbAlertBoxCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string msg);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbConfirmBoxCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string msg);
+    public delegate bool mbConfirmBoxCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string msg);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate mbStringPtr mbPromptBoxCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string msg, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string defaultResult);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
 
 
-    public delegate int mbNavigationCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url);
+    public delegate bool mbNavigationCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public unsafe delegate IntPtr mbCreateViewCallback(mbWebView webview, IntPtr param, mbNavigationType navigationType, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, [In]ref mbWindowFeatures windowFeatures);
 
@@ -431,9 +431,9 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbDocumentReadyCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbCloseCallback(mbWebView webview, IntPtr param, IntPtr unuse);
+    public delegate bool mbCloseCallback(mbWebView webview, IntPtr param, IntPtr unuse);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbDestroyCallback(mbWebView webview, IntPtr param, IntPtr unuse);
+    public delegate bool mbDestroyCallback(mbWebView webview, IntPtr param, IntPtr unuse);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbOnShowDevtoolsCallback(mbWebView webview, IntPtr param);
 
@@ -441,9 +441,9 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbDidCreateScriptContextCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId, IntPtr context, int extensionGroup, int worldId);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbGetPluginListCallback([MarshalAs(UnmanagedType.Bool)] bool refresh, IntPtr pluginListBuilder, IntPtr param);
+    public delegate bool mbGetPluginListCallback([MarshalAs(UnmanagedType.Bool)] bool refresh, IntPtr pluginListBuilder, IntPtr param);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbNetResponseCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job);
+    public delegate bool mbNetResponseCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job);
     public enum mbLoadingResult
     {
         MB_LOADING_SUCCEEDED,
@@ -454,7 +454,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbLoadingFinishCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbLoadingResult result, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string failedReason);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbDownloadCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, IntPtr downloadJob);
+    public delegate bool mbDownloadCallback(mbWebView webview, IntPtr param, mbWebFrameHandle frameId,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, IntPtr downloadJob);
     public enum mbConsoleLevel
     {
         mbLevelDebug = 4,
@@ -476,7 +476,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
 
     //mbNet--------------------------------------------------------------------------------------
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbLoadUrlBeginCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job);
+    public delegate bool mbLoadUrlBeginCallback(mbWebView webview, IntPtr param, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate void mbLoadUrlEndCallback(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string url, mbNetJob job, IntPtr buf, int len);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
@@ -616,7 +616,7 @@ namespace Raindrops.UI.WebView.Miniblink.PInvoke
         public float scale;
     }
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
-    public delegate int mbPrintingCallback(mbWebView webview, IntPtr param, mbPrintintStep step, IntPtr hDC,[In] ref mbPrintintSettings settings, int pageCount);
+    public delegate bool mbPrintingCallback(mbWebView webview, IntPtr param, mbPrintintStep step, IntPtr hDC,[In] ref mbPrintintSettings settings, int pageCount);
     [UnmanagedFunctionPointer(NativeConstants.MB_CALL_TYPE)]
     public delegate mbStringPtr mbImageBufferToDataURLCallback(mbWebView webview, IntPtr param,  [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string data, size_t size);
     [StructLayout(LayoutKind.Sequential)]

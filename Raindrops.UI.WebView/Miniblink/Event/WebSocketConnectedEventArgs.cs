@@ -15,6 +15,6 @@ namespace Raindrops.UI.WebView.Miniblink.Event
         [Map(Name = "channel")]
         public mbWebSocketChannel Channel { get; set; }
         [Map(IsRet = true)]
-        public int Result { get; set; }
+        public bool Result { get; set; }
     }
 }
